@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-
+import os
 
 st.set_page_config(
     page_title="MindScroll",
@@ -210,6 +210,34 @@ if st.button("Mulai Analisis"):
         else:
             skor+=4
 
+    # menentukan indikator
+    if skor <= 15:
+        status = "Aman"
+    elif skor <= 28:
+        status = "Perlu Perhatian"
+    else:
+        status = "Buruk"
+
+
+    # simpan ke excel
+    data_baru = pd.DataFrame({
+        "Nama": [nama],
+        "Link": ["Form MindScroll"],
+        "Indikator": [status]
+    })
+
+
+    file="hasil_mindscroll.xlsx"
+
+
+    if os.path.exists(file):
+        data_lama = pd.read_excel(file)
+        data_akhir = pd.concat([data_lama, data_baru], ignore_index=True)
+    else:
+        data_akhir = data_baru
+
+
+    data_akhir.to_excel(file, index=False)
 
 
     st.markdown(f"""
@@ -418,3 +446,17 @@ tetapi membuat {nama} kembali mengendalikan teknologi.
 st.caption(
 "MindScroll | Digital Behavior Analysis"
 )
+
+
+st.markdown("""
+<div class="section">
+Data Hasil Pengguna
+</div>
+""", unsafe_allow_html=True)
+
+
+if st.button("analisis hasil pengguna"):
+
+    data = pd.read_excel("hasil_mindscroll.xlsx")
+
+    st.dataframe(data)
